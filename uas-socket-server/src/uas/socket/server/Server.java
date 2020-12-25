@@ -43,17 +43,28 @@ public class Server extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+
         titleServer.setFont(new java.awt.Font("Inter ExtraBold", 0, 24)); // NOI18N
+        titleServer.setForeground(new java.awt.Color(0, 0, 0));
         titleServer.setText("Server");
 
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Port");
 
+        txtPortServer.setBackground(new java.awt.Color(204, 204, 204));
+        txtPortServer.setForeground(new java.awt.Color(0, 0, 0));
         txtPortServer.setText("16348");
 
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
         jLabel3.setText("Alamat IP");
 
+        txtIPServer.setBackground(new java.awt.Color(204, 204, 204));
+        txtIPServer.setForeground(new java.awt.Color(0, 0, 0));
         txtIPServer.setText("192.168.43.93");
 
+        btnListen.setBackground(new java.awt.Color(255, 255, 255));
+        btnListen.setForeground(new java.awt.Color(0, 0, 0));
         btnListen.setText("Listen");
         btnListen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -61,7 +72,11 @@ public class Server extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane1.setForeground(new java.awt.Color(0, 0, 0));
+
+        txtPesanDiterimaServer.setBackground(new java.awt.Color(204, 204, 204));
         txtPesanDiterimaServer.setColumns(20);
+        txtPesanDiterimaServer.setForeground(new java.awt.Color(0, 0, 0));
         txtPesanDiterimaServer.setRows(5);
         jScrollPane1.setViewportView(txtPesanDiterimaServer);
 
@@ -132,6 +147,8 @@ public class Server extends javax.swing.JFrame {
             new Thread(() -> {
                 try {
                     EchoServer(txtIPServer.getText(), Integer.parseInt(txtPortServer.getText()));
+                    JOptionPane.showMessageDialog(null, "Server listening");
+                    btnListen.setEnabled(false);
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }

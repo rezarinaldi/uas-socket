@@ -50,17 +50,28 @@ public class Client extends javax.swing.JFrame {
         btnShow = new javax.swing.JButton();
         btnSend = new javax.swing.JButton();
         titleClient = new javax.swing.JLabel();
+        btnClear = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Port");
 
+        txtPortClient.setBackground(new java.awt.Color(102, 102, 102));
+        txtPortClient.setForeground(new java.awt.Color(255, 255, 255));
         txtPortClient.setText("16348");
 
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("IP Tujuan");
 
+        txtIPClient.setBackground(new java.awt.Color(102, 102, 102));
+        txtIPClient.setForeground(new java.awt.Color(255, 255, 255));
         txtIPClient.setText("192.168.43.93");
 
+        btnOpenFile.setBackground(new java.awt.Color(0, 0, 0));
+        btnOpenFile.setForeground(new java.awt.Color(255, 255, 255));
         btnOpenFile.setText("Open File");
         btnOpenFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -68,10 +79,19 @@ public class Client extends javax.swing.JFrame {
             }
         });
 
+        txtFileText.setBackground(new java.awt.Color(102, 102, 102));
+        txtFileText.setForeground(new java.awt.Color(255, 255, 255));
+
+        jScrollPane1.setForeground(new java.awt.Color(255, 255, 255));
+
+        txtShow.setBackground(new java.awt.Color(102, 102, 102));
         txtShow.setColumns(20);
+        txtShow.setForeground(new java.awt.Color(255, 255, 255));
         txtShow.setRows(5);
         jScrollPane1.setViewportView(txtShow);
 
+        btnShow.setBackground(new java.awt.Color(0, 0, 0));
+        btnShow.setForeground(new java.awt.Color(255, 255, 255));
         btnShow.setText("Show Text");
         btnShow.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -79,6 +99,8 @@ public class Client extends javax.swing.JFrame {
             }
         });
 
+        btnSend.setBackground(new java.awt.Color(0, 0, 0));
+        btnSend.setForeground(new java.awt.Color(255, 255, 255));
         btnSend.setText("Send");
         btnSend.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -87,7 +109,19 @@ public class Client extends javax.swing.JFrame {
         });
 
         titleClient.setFont(new java.awt.Font("Inter ExtraBold", 0, 24)); // NOI18N
+        titleClient.setForeground(new java.awt.Color(255, 255, 255));
         titleClient.setText("Client");
+
+        btnClear.setBackground(new java.awt.Color(0, 0, 0));
+        btnClear.setForeground(new java.awt.Color(255, 255, 255));
+        btnClear.setText("Clear");
+        btnClear.setMaximumSize(new java.awt.Dimension(41, 24));
+        btnClear.setMinimumSize(new java.awt.Dimension(41, 24));
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -117,7 +151,10 @@ public class Client extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(txtIPClient, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(btnOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addComponent(btnSend, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                            .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(41, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -140,7 +177,9 @@ public class Client extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(17, 17, 17))
         );
 
@@ -167,6 +206,7 @@ public class Client extends javax.swing.JFrame {
             File file = fileChooser.getSelectedFile();
             try {
                 txtFileText.setText(file.getPath());
+                JOptionPane.showMessageDialog(null, "File telah dipilih.");
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -200,10 +240,16 @@ public class Client extends javax.swing.JFrame {
             AtomicInteger messageRead = new AtomicInteger(0);
 
             EchoClient(txtIPClient.getText(), Integer.parseInt(txtPortClient.getText()), txtShow.getText(), messageWritten, messageRead);
+            JOptionPane.showMessageDialog(null, "Pesan telah dikirim.");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }//GEN-LAST:event_btnSendActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        txtFileText.setText("");
+        txtShow.setText("");
+    }//GEN-LAST:event_btnClearActionPerformed
 
     //////////////////////////
     // Socket Client Helper //
@@ -308,6 +354,7 @@ public class Client extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClear;
     private javax.swing.JButton btnOpenFile;
     private javax.swing.JButton btnSend;
     private javax.swing.JButton btnShow;
