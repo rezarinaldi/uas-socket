@@ -1,16 +1,17 @@
 package uas.socket.server;
 
 import javax.swing.*;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.*;
+import java.io.*;
+import java.net.*;
 
 /**
  *
  * @author Reza
  */
 public class Server extends javax.swing.JFrame {
+
+    private ServerSocket serverSocket;
+    private Socket clientSocket;
 
     /**
      * Creates new form server
@@ -52,15 +53,15 @@ public class Server extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Port");
 
-        txtPortServer.setBackground(new java.awt.Color(204, 204, 204));
-        txtPortServer.setForeground(new java.awt.Color(0, 0, 0));
+        txtPortServer.setBackground(new java.awt.Color(0, 0, 0));
+        txtPortServer.setForeground(new java.awt.Color(204, 204, 204));
         txtPortServer.setText("16348");
 
         jLabel3.setForeground(new java.awt.Color(0, 0, 0));
         jLabel3.setText("Alamat IP");
 
-        txtIPServer.setBackground(new java.awt.Color(204, 204, 204));
-        txtIPServer.setForeground(new java.awt.Color(0, 0, 0));
+        txtIPServer.setBackground(new java.awt.Color(0, 0, 0));
+        txtIPServer.setForeground(new java.awt.Color(204, 204, 204));
         txtIPServer.setText("192.168.43.93");
 
         btnListen.setBackground(new java.awt.Color(255, 255, 255));
@@ -144,94 +145,86 @@ public class Server extends javax.swing.JFrame {
 
     private void btnListenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListenActionPerformed
         try {
-            new Thread(() -> {
-                try {
-                    EchoServer(txtIPServer.getText(), Integer.parseInt(txtPortServer.getText()));
-                    JOptionPane.showMessageDialog(null, "Server listening");
-                    btnListen.setEnabled(false);
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
-            }).start();
+            new Thread(this::EchoServer).start();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }//GEN-LAST:event_btnListenActionPerformed
 
-    //////////////////////////
-    // Socket Server Helper //
-    //////////////////////////
-    public void EchoServer(String bindAddr, int bindPort) throws IOException {
-        InetSocketAddress sockAddr = new InetSocketAddress(bindAddr, bindPort);
-
-        //create a socket channel and bind to local bind address
-        AsynchronousServerSocketChannel serverSock = AsynchronousServerSocketChannel.open().bind(sockAddr);
-
-        //start to accept the connection from client
-        serverSock.accept(serverSock, new CompletionHandler<AsynchronousSocketChannel, AsynchronousServerSocketChannel>() {
-
-            @Override
-            public void completed(AsynchronousSocketChannel sockChannel, AsynchronousServerSocketChannel serverSock) {
-                //a connection is accepted, start to accept next connection
-                serverSock.accept(serverSock, this);
-                //start to read message from the client
-                startRead(sockChannel);
-
-            }
-
-            @Override
-            public void failed(Throwable exc, AsynchronousServerSocketChannel serverSock) {
-                System.out.println("fail to accept a connection");
-            }
-
-        });
+    // Socket Server Helper
+    public ServerSocket getServerSocket() {
+        return serverSocket;
     }
 
-    private void startRead(AsynchronousSocketChannel sockChannel) {
-        final ByteBuffer buf = ByteBuffer.allocate(2048);
-
-        //read message from client
-        sockChannel.read(buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>() {
-
-            /**
-             * some message is read from client, this callback will be called
-             */
-            @Override
-            public void completed(Integer result, AsynchronousSocketChannel channel) {
-                buf.flip();
-
-                // echo the message
-                startWrite(channel, buf);
-
-                //start to read next message again
-                startRead(channel);
-
-                // menampilkan string pesan ke textfield txtPesanDiterimaServer
-                txtPesanDiterimaServer.setText(new String(buf.array()));
-            }
-
-            @Override
-            public void failed(Throwable exc, AsynchronousSocketChannel channel) {
-                System.out.println("fail to read message from client");
-            }
-        });
+    public void setServerSocket(ServerSocket serverSocket) {
+        this.serverSocket = serverSocket;
     }
 
-    private void startWrite(AsynchronousSocketChannel sockChannel, final ByteBuffer buf) {
-        sockChannel.write(buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>() {
+    public Socket getClientSocket() {
+        return clientSocket;
+    }
 
-            @Override
-            public void completed(Integer result, AsynchronousSocketChannel channel) {
-                //finish to write message to client, nothing to do
+    public void setClientSocket(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+    }
+
+    private void EchoServer() {
+        try {
+            int port = Integer.parseInt(txtPortServer.getText());
+            InetAddress ip = InetAddress.getByName(txtIPServer.getText());
+            setServerSocket(new ServerSocket(port, 1, ip));
+            JOptionPane.showMessageDialog(null, "Server listening");
+            btnListen.setEnabled(false);
+            txtPortServer.setEnabled(false);
+            txtIPServer.setEnabled(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+        if (getServerSocket() != null) {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    communicate(getServerSocket().accept());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        }
+    }
 
-            @Override
-            public void failed(Throwable exc, AsynchronousSocketChannel channel) {
-                //fail to write message to client
-                System.out.println("Fail to write message to client");
+    private void communicate(Socket socket) {
+        setClientSocket(socket);
+        BufferedReader input = null;
+        try {
+            input = new BufferedReader(new InputStreamReader(getClientSocket().getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed connect to Client: " + e.getMessage());
+        }
+        System.out.println("Connected to Client!");
+
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                assert input != null;
+                StringBuilder tmp = new StringBuilder();
+                while (input.ready()) {
+                    String line = input.readLine();
+                    tmp.append(line);
+                    tmp.append("\n");
+                }
+                txtPesanDiterimaServer.setText(tmp.toString());
+                String read = input.readLine();
+                if (read == null) {
+                    Thread.interrupted();
+                    read = "Off";
+                    System.out.println("Client: " + read);
+                    break;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-        });
+        }
     }
 
     /**

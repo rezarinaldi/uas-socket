@@ -1,11 +1,8 @@
 package uas.socket.client;
 
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.*;
-import java.util.StringTokenizer;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.net.Socket;
+import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -15,7 +12,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class Client extends javax.swing.JFrame {
 
-    JFileChooser fileChooser = new JFileChooser();
+    private String contents = null;
 
     /**
      * Creates new form client
@@ -24,9 +21,6 @@ public class Client extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
         this.setTitle("UAS - Socket Client");
-
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Document File", "doc", "docx", "rtf", "odt"));
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Text File", "txt"));
     }
 
     /**
@@ -45,12 +39,8 @@ public class Client extends javax.swing.JFrame {
         txtIPClient = new javax.swing.JTextField();
         btnOpenFile = new javax.swing.JButton();
         txtFileText = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtShow = new javax.swing.JTextArea();
-        btnShow = new javax.swing.JButton();
         btnSend = new javax.swing.JButton();
         titleClient = new javax.swing.JLabel();
-        btnClear = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -79,25 +69,8 @@ public class Client extends javax.swing.JFrame {
             }
         });
 
-        txtFileText.setBackground(new java.awt.Color(102, 102, 102));
-        txtFileText.setForeground(new java.awt.Color(255, 255, 255));
-
-        jScrollPane1.setForeground(new java.awt.Color(255, 255, 255));
-
-        txtShow.setBackground(new java.awt.Color(102, 102, 102));
-        txtShow.setColumns(20);
-        txtShow.setForeground(new java.awt.Color(255, 255, 255));
-        txtShow.setRows(5);
-        jScrollPane1.setViewportView(txtShow);
-
-        btnShow.setBackground(new java.awt.Color(0, 0, 0));
-        btnShow.setForeground(new java.awt.Color(255, 255, 255));
-        btnShow.setText("Show Text");
-        btnShow.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnShowActionPerformed(evt);
-            }
-        });
+        txtFileText.setBackground(new java.awt.Color(255, 255, 255));
+        txtFileText.setForeground(new java.awt.Color(102, 102, 102));
 
         btnSend.setBackground(new java.awt.Color(0, 0, 0));
         btnSend.setForeground(new java.awt.Color(255, 255, 255));
@@ -112,75 +85,54 @@ public class Client extends javax.swing.JFrame {
         titleClient.setForeground(new java.awt.Color(255, 255, 255));
         titleClient.setText("Client");
 
-        btnClear.setBackground(new java.awt.Color(0, 0, 0));
-        btnClear.setForeground(new java.awt.Color(255, 255, 255));
-        btnClear.setText("Clear");
-        btnClear.setMaximumSize(new java.awt.Dimension(41, 24));
-        btnClear.setMinimumSize(new java.awt.Dimension(41, 24));
-        btnClear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClearActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(42, 42, 42)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(119, 119, 119)
+                        .addGap(161, 161, 161)
                         .addComponent(titleClient))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jLabel1)
-                                    .addGap(18, 18, 18)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(txtFileText, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addComponent(txtPortClient, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(27, 27, 27)
-                                            .addComponent(jLabel2))))
-                                .addComponent(btnShow, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(18, 18, 18)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtIPClient, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                            .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(41, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtPortClient, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(27, 27, 27)
+                                .addComponent(jLabel2)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtIPClient, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtFileText, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(btnOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))))))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addComponent(titleClient)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
+                .addGap(54, 54, 54)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtPortClient, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
                     .addComponent(txtIPClient, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(28, 28, 28)
+                .addComponent(txtFileText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(24, 24, 24)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtFileText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(24, 24, 24)
-                .addComponent(btnShow, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(17, 17, 17))
+                    .addComponent(btnOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(55, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -191,130 +143,79 @@ public class Client extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnOpenFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenFileActionPerformed
-
-        int result = fileChooser.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            try {
-                txtFileText.setText(file.getPath());
-                JOptionPane.showMessageDialog(null, "File telah dipilih.");
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
-            }
+        try {
+            contents = OpenFile();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_btnOpenFileActionPerformed
 
-    private void btnShowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowActionPerformed
-        txtShow.setText(null);
-        String path = txtFileText.getText();
-
-        File file = new File(path);
-        try {
-            FileInputStream fstream = new FileInputStream(file);
-            DataInputStream in = new DataInputStream(fstream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-            String strLine;
-            while ((strLine = br.readLine()) != null) {
-                StringTokenizer st = new StringTokenizer(strLine, ".");
-                txtShow.setText(txtShow.getText() + st.nextToken() + "\n");
-            }
-            in.close();
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }//GEN-LAST:event_btnShowActionPerformed
-
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-        try {
-            AtomicInteger messageWritten = new AtomicInteger(0);
-            AtomicInteger messageRead = new AtomicInteger(0);
-
-            EchoClient(txtIPClient.getText(), Integer.parseInt(txtPortClient.getText()), txtShow.getText(), messageWritten, messageRead);
+        String host = txtIPClient.getText();
+        int port = Integer.parseInt(txtPortClient.getText());
+        if (host != null && port != 0 && contents != null) {
+            SendToServer(host, port, contents);
             JOptionPane.showMessageDialog(null, "Pesan telah dikirim.");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }//GEN-LAST:event_btnSendActionPerformed
 
-    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
-        txtFileText.setText("");
-        txtShow.setText("");
-    }//GEN-LAST:event_btnClearActionPerformed
-
-    //////////////////////////
-    // Socket Client Helper //
-    //////////////////////////
-    public void EchoClient(String host, int port, final String message, final AtomicInteger messageWritten, final AtomicInteger messageRead) throws IOException {
-        //create a socket channel
-        AsynchronousSocketChannel sockChannel = AsynchronousSocketChannel.open();
-
-        //try to connect to the server side
-        sockChannel.connect(new InetSocketAddress(host, port), sockChannel, new CompletionHandler<Void, AsynchronousSocketChannel>() {
-            @Override
-            public void completed(Void result, AsynchronousSocketChannel channel) {
-                //start to read message
-                startRead(channel, messageRead);
-
-                //write an message to server side
-                startWrite(channel, message, messageWritten);
-            }
-
-            @Override
-            public void failed(Throwable exc, AsynchronousSocketChannel channel) {
-                System.out.println("fail to connect to server");
-            }
-
-        });
+    // Socket Client Helper
+    private String OpenFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Document File", "doc", "docx", "rtf", "odt"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Text File", "txt", "sql"));
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            txtFileText.setText(file.getAbsolutePath());
+            JOptionPane.showMessageDialog(null, "File telah dipilih.");
+            return ReadFile(file);
+        } else if (result == JFileChooser.CANCEL_OPTION) {
+            JOptionPane.showMessageDialog(null, "Batal memilih file.");
+        }
+        return null;
     }
 
-    private void startRead(final AsynchronousSocketChannel sockChannel, final AtomicInteger messageRead) {
-        final ByteBuffer buf = ByteBuffer.allocate(2048);
-
-        sockChannel.read(buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>() {
-
-            @Override
-            public void completed(Integer result, AsynchronousSocketChannel channel) {
-                //message is read from server
-                messageRead.getAndIncrement();
-
-                //print the message
-                System.out.println("Read message:" + new String(buf.array()));
+    private String ReadFile(File file) {
+        StringBuilder textTmp = new StringBuilder();
+        try {
+            Scanner input = new Scanner(file);
+            while (input.hasNext()) {
+                textTmp.append(input.nextLine());
+                textTmp.append("\n");
             }
-
-            @Override
-            public void failed(Throwable exc, AsynchronousSocketChannel channel) {
-                System.out.println("fail to read message from server");
-            }
-        });
+            input.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return textTmp.toString();
     }
 
-    private void startWrite(final AsynchronousSocketChannel sockChannel, final String message, final AtomicInteger messageWritten) {
-        ByteBuffer buf = ByteBuffer.allocate(2048);
-        buf.put(message.getBytes());
-        buf.flip();
-        messageWritten.getAndIncrement();
-        sockChannel.write(buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>() {
-            @Override
-            public void completed(Integer result, AsynchronousSocketChannel channel) {
-                //after message written
-                //NOTHING TO DO
+    private void SendToServer(String host, int port, final String message) {
+        try {
+            Socket socket = new Socket(host, port);
+
+            if (socket.isBound()) {
+                System.out.println("Connected to Server IP: " + host + " Port: " + port);
             }
 
-            @Override
-            public void failed(Throwable exc, AsynchronousSocketChannel channel) {
-                System.out.println("Fail to write the message to server");
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            out.println(message);
+            out.flush();
+            socket.close();
+            if (socket.isClosed()) {
+                System.out.println("Disconnected");
             }
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -354,18 +255,14 @@ public class Client extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnClear;
     private javax.swing.JButton btnOpenFile;
     private javax.swing.JButton btnSend;
-    private javax.swing.JButton btnShow;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel titleClient;
     private javax.swing.JTextField txtFileText;
     private javax.swing.JTextField txtIPClient;
     private javax.swing.JTextField txtPortClient;
-    private javax.swing.JTextArea txtShow;
     // End of variables declaration//GEN-END:variables
 }
